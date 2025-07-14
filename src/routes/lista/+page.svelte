@@ -1,28 +1,21 @@
 <script>
 	import Rodape from '../Rodape.svelte';
+	let { data, form } = $props();
 
-	const tarefas = $state([]);
+	console.log(form);
+
+	const tarefas = data.todasoracoes;
 	let tarefaNova = $state();
 	let tarefaEditandoIndice = $state();
 	let tarefaEditando = $state();
 
-	function adicionarTarefa() {
-		if (tarefaNova == '') return;
-		tarefas.push({nome:tarefaNova, status:false});
-		tarefaNova = '';
-	}
-
-	function excluirTarefa(i) {
-		tarefas.splice(i, 1);
-	}
-
 	function editarTarefa(i) {
 		tarefaEditandoIndice = i;
-		tarefaEditando = tarefas[i].nome;
+		tarefaEditando = tarefas[i].conteudo;
 	}
 
 	function salvarTarefa(i) {
-		tarefas[i].nome = tarefaEditando;
+		tarefas[i].conteudo = tarefaEditando;
 		tarefaEditandoIndice = null;
 	}
 
@@ -34,31 +27,47 @@
 
 <div class="d-flex flex-column align-items-center">
 	<h1 class="titulo my-3">Lista de Oarações🩵</h1>
-	<p class="mb-3">
-		<input
-			maxlength="64"
-			onkeydown={(event) => event.key == 'Enter' && adicionarTarefa()}
-			placeholder="Digite a tarefa..."
-			bind:value={tarefaNova}
-		/>
-		<button class="btn" onclick={adicionarTarefa}>➕</button>
-	</p>
+	<div class="mb-3">
+		<form action="?/salvaroracao" method="POST">
+			<input
+				name="oracao"
+				maxlength="64"
+				placeholder="Digite a tarefa..."
+				bind:value={tarefaNova}
+			/>
+			<button class="btn">➕</button>
+		</form>
+	</div>
 	<ul class="list-group list-group-flush">
 		{#each tarefas as tarefa, i}
 			<li
 				class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-black"
 			>
 				{#if tarefaEditandoIndice == i}
-					<input bind:value={tarefaEditando} />
-					<button class="btn btn-sm" onclick={() => salvarTarefa(i)}>✅</button>
-					<button class="btn btn-sm" onclick={() => cancelarEdicao(i)}>❌</button>
+					<form action="?/editaroracao" method="post">
+						<input type="hidden" name="id" value={tarefa.id} />
+						<input name="conteudo" bind:value={tarefaEditando} />
+						<button class="btn btn-sm">✅</button>
+						<button class="btn btn-sm" onclick={() => cancelarEdicao(i)}>❌</button>
+					</form>
 				{:else}
-					<input class="form-check-input me-1" type="checkbox" bind:checked={tarefa.status} id="{i}" />
-					<label class="form-check-label" class:checked={tarefa.status} for="{i}"> {tarefa.nome} </label>
+					<input
+						class="form-check-input me-1"
+						type="checkbox"
+						bind:checked={tarefa.status}
+						id={i}
+					/>
+					<label class="form-check-label" class:checked={tarefa.status} for={i}>
+						{tarefa.conteudo}
+					</label>
 
 					<div>
 						<button class="btn btn-sm" onclick={() => editarTarefa(i)}>✏</button>
-						<button class="btn btn-sm" onclick={() => excluirTarefa(i)}>🗑</button>
+						<form action="?/apagaroracao" method="POST">
+							<input type="hidden" name="id" value={tarefa.id} /><button class="btn btn-sm"
+								>🗑</button
+							>
+						</form>
 					</div>
 				{/if}
 			</li>
@@ -75,6 +84,10 @@
 </svelte:head>
 
 <style>
+	form {
+		display: inline;
+	}
+
 	.titulo {
 		font-family: Lucida Handwriting;
 		text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
@@ -90,7 +103,7 @@
 	}
 
 	.form-check-input:checked {
-    background-color: rgb(3, 22, 51);
-    border-color: rgb(3, 22, 51);
-}
+		background-color: rgb(3, 22, 51);
+		border-color: rgb(3, 22, 51);
+	}
 </style>
