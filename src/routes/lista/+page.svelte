@@ -1,5 +1,4 @@
 <script>
-	import Rodape from '../Rodape.svelte';
 	let { data, form } = $props();
 
 	console.log(form);
@@ -26,7 +25,7 @@
 </script>
 
 <div class="d-flex flex-column align-items-center">
-	<h1 class="titulo my-3">Lista de Oarações🩵</h1>
+	<h1 class="titulo my-3">Lista de Orações🩵</h1>
 	<div class="mb-3">
 		<form action="?/salvaroracao" method="POST">
 			<input
